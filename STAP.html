@@ -24,14 +24,16 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
 #sheet-wrap{background:#fff;border-bottom:2px solid #2a1a0a;padding:3px;}
 .sh-title{text-align:center;font-size:11px;font-weight:bold;letter-spacing:1px;margin-bottom:2px;}
 .sh-info{font-size:8px;color:#555;display:flex;justify-content:space-between;margin-bottom:2px;}
-.sh-teams{display:grid;grid-template-columns:1fr 44px 1fr;border:1px solid #000;font-size:9px;}
-.sh-tx{padding:2px 3px;font-weight:bold;color:#004400;border-right:1px solid #000;}
+.sh-teams{display:grid;grid-template-columns:1fr 44px 1fr;border:1px solid #000;font-size:12px;}
+.sh-tx{padding:3px 4px;font-weight:bold;color:#004400;border-right:1px solid #000;}
 .sh-tc{font-size:7px;display:flex;align-items:center;justify-content:center;border-right:1px solid #000;color:#666;}
-.sh-ty{padding:2px 3px;font-weight:bold;color:#660000;}
-.sh-players{display:grid;grid-template-columns:1fr 44px 1fr;border:1px solid #000;border-top:none;font-size:8px;}
-.sh-px{padding:1px 3px;color:#004400;border-right:1px solid #000;}
-.sh-pc{border-right:1px solid #000;}
-.sh-py{padding:1px 3px;color:#660000;}
+.sh-ty{padding:3px 4px;font-weight:bold;color:#660000;}
+.sh-players{display:grid;grid-template-columns:1fr 44px 1fr;border:1px solid #000;border-top:none;font-size:10px;}
+.sh-px{padding:2px 4px;color:#004400;border-right:1px solid #000;}
+.sh-pc{border-right:1px solid #000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;}
+.sh-py{padding:2px 4px;color:#660000;}
+.sh-gc{font-size:11px;font-weight:bold;color:#2a1a0a;line-height:1.2;text-align:center;}
+.sh-gl{font-size:7px;color:#888;text-align:center;line-height:1;}
 .gb{border:1px solid #000;border-top:none;}
 .gb.cur{background:#fffff4;}
 .gb-head{display:grid;grid-template-columns:1fr 44px 1fr;border-bottom:1px solid #ccc;background:#f5f0e0;min-height:20px;}
@@ -45,7 +47,8 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
 .fby{font-size:7px;background:#f0e0e0;border:1px solid #660000;color:#660000;padding:0 3px;border-radius:2px;font-weight:bold;white-space:nowrap;}
 .gb-pts{display:grid;grid-template-columns:1fr 44px 1fr;}
 .pts-col{display:flex;flex-direction:column;}
-.pts-ctr{border-left:1px solid #000;border-right:1px solid #000;}
+.pts-col:first-child{border-right:1px solid #000;}
+.pts-ctr{border-right:1px solid #000;}
 .ptrow{display:flex;}
 .pc{flex:1;height:18px;border-right:1px dotted #ddd;border-bottom:1px dotted #ddd;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .pc:last-child{border-right:none;}
@@ -138,7 +141,7 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
 .folder-add-row button{padding:4px 10px;font-size:11px;background:#1a5a1a;color:#fff;border:none;border-radius:2px;}
 /* 印刷 */
 @media print{
-  #nav,#status,#input-wrap,#tab-history,#tab-analysis,.no-print{display:none!important;}
+  #nav,#status,#input-wrap,#tab-history,.no-print{display:none!important;}
   #page-body{margin-top:0;}
   body{background:#fff;}
 }
@@ -225,14 +228,14 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
         <button onclick="openEdit()">✏️ 編集</button>
         <button onclick="openMemo()" style="background:#3a5a8a;color:#fff;">📝 メモ</button>
         <button onclick="doSave()">💾 保存</button>
-        <button onclick="window.print()" class="print-btn">🖨️ 印刷</button>
+        <button onclick="printRecord()" class="print-btn">🖨️ 印刷</button>
         <button onclick="showTab('analysis')">分析 →</button>
       </div>
     </div>
   </div>
   <div id="tab-analysis">
     <div style="padding:4px 0 4px 0;display:flex;gap:4px;" class="no-print">
-      <button onclick="window.print()" class="print-btn" style="margin-bottom:2px;">🖨️ 分析を印刷</button>
+      <button onclick="printAnalysis()" class="print-btn" style="margin-bottom:2px;">🖨️ 分析を印刷</button>
     </div>
     <div id="an-out" class="anwrap"><p class="empty">データなし</p></div>
   </div>
@@ -699,7 +702,9 @@ function renderSheet(){
   tn.innerHTML='<div class="sh-tx">'+nx+'</div><div class="sh-tc">スコア</div><div class="sh-ty">'+ny+'</div>';
   body.appendChild(tn);
   var pl=document.createElement('div');pl.className='sh-players';
-  pl.innerHTML='<div class="sh-px">A:'+cur.pXA+'　B:'+cur.pXB+'</div><div class="sh-pc"></div><div class="sh-py">A:'+cur.pYA+'　B:'+cur.pYB+'</div>';
+  var gcX=cur.totX||0,gcY=cur.totY||0;
+  var gLabel=cur.done?'終了':'G'+((cur.curG||0)+1);
+  pl.innerHTML='<div class="sh-px">A:'+cur.pXA+'　B:'+cur.pXB+'</div><div class="sh-pc"><div class="sh-gc">'+gcX+'-'+gcY+'</div><div class="sh-gl">'+gLabel+'</div></div><div class="sh-py">A:'+cur.pYA+'　B:'+cur.pYB+'</div>';
   body.appendChild(pl);
 
   var COLS=11;
@@ -1043,6 +1048,41 @@ function buildHistory(){
   });
 }
 
+// ===== 印刷 =====
+function printRecord(){
+  // 分析タブを一時的に隠して採点票を印刷
+  var an=document.getElementById('tab-analysis');
+  var hi=document.getElementById('tab-history');
+  var rec=document.getElementById('tab-record');
+  var anD=an.style.display;
+  var hiD=hi.style.display;
+  an.style.display='none';
+  hi.style.display='none';
+  rec.style.display='block';
+  window.print();
+  setTimeout(function(){
+    an.style.display=anD;
+    hi.style.display=hiD;
+  },500);
+}
+function printAnalysis(){
+  buildAnalysis();
+  // 採点票タブを一時的に隠して分析を印刷
+  var an=document.getElementById('tab-analysis');
+  var hi=document.getElementById('tab-history');
+  var rec=document.getElementById('tab-record');
+  var recD=rec.style.display;
+  var hiD=hi.style.display;
+  an.style.display='block';
+  hi.style.display='none';
+  rec.style.display='none';
+  window.print();
+  setTimeout(function(){
+    rec.style.display=recD;
+    hi.style.display=hiD;
+    an.style.display='none';
+  },500);
+}
 // ===== メモ機能 =====
 function openMemo(){
   if(!cur)return;

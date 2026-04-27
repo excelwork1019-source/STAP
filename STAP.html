@@ -74,12 +74,20 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
 .sel-btn.on-green{background:#1a6a1a;color:#fff;border-color:#0a4a0a;font-weight:bold;}
 .sel-btn.on-red{background:#8a1a1a;color:#fff;border-color:#5a0a0a;font-weight:bold;}
 .sel-btn.on-orange{background:#8a5a0a;color:#fff;border-color:#5a3a0a;font-weight:bold;}
-.course-row{display:none;background:#f0f8f0;border:1px solid #aaddaa;border-radius:3px;padding:4px 6px;margin-bottom:3px;}
-.course-row.active{display:flex;flex-wrap:wrap;gap:2px;align-items:center;}
-.sa-row{display:none;background:#fff8e0;border:1px solid #ddbb44;border-radius:3px;padding:4px 6px;margin-bottom:3px;}
-.sa-row.active{display:flex;flex-wrap:wrap;gap:2px;align-items:center;}
+.sub-row{display:none;border-radius:3px;padding:4px 6px;margin-bottom:3px;flex-wrap:wrap;gap:2px;align-items:center;}
+.sub-row.active{display:flex;}
+.sub-row.green{background:#f0f8f0;border:1px solid #aaddaa;}
+.sub-row.orange{background:#fff8e0;border:1px solid #ddbb44;}
+.sub-row.red{background:#fff0f0;border:1px solid #ffaaaa;}
+.sub-lbl{font-size:9px;font-weight:bold;min-width:60px;}
 .sel-status{font-size:9px;background:#fff9e0;border:1px solid #ccaa44;padding:3px 6px;border-radius:3px;margin-bottom:4px;color:#554400;}
 .miss-note{font-size:9px;background:#fff0f0;border:1px solid #cc4444;padding:4px 6px;border-radius:3px;margin-bottom:4px;display:none;color:#880000;}
+#srv-ui{background:#fff8e8;border:1px solid #e8c050;border-radius:4px;padding:6px;margin-bottom:4px;display:none;}
+#srv-ui .srv-lbl{font-size:9px;font-weight:bold;color:#7a5a00;margin-bottom:4px;}
+.srv-big{padding:10px 14px;font-size:13px;font-weight:bold;border-radius:4px;border:2px solid #aaa;background:#f5f5f5;color:#333;margin-right:4px;}
+.srv-big.ok{background:#1a6a1a;color:#fff;border-color:#1a6a1a;}
+.srv-big.ng{background:#8a1a1a;color:#fff;border-color:#8a1a1a;}
+#rsn-ui{display:none;}
 #sig{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:4px;}
 .tbox{border:2px solid #ccc;border-radius:4px;padding:5px;}
 .tbox.xb{border-color:#1a5a1a;background:#f0fff4;}
@@ -177,49 +185,97 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
     </div>
     <div id="status"><span class="sbadge" id="srv-b">サーブ：-</span><span class="pbadge" id="sc-b">-</span></div>
     <div id="input-wrap">
+      <!-- ② サーブUI（サーブ権あり側のみ表示） -->
+      <div id="srv-ui">
+        <div class="srv-lbl" id="srv-ui-lbl">🎾 ファーストサーブ</div>
+        <div id="srv-first-row">
+          <button class="srv-big" id="srv1-ok" onclick="setSrv1(true)">✓ イン</button>
+          <button class="srv-big" id="srv1-ng" onclick="setSrv1(false)">✕ フォルト</button>
+        </div>
+        <div id="srv-second-row" style="display:none;margin-top:4px;">
+          <span style="font-size:9px;color:#7a5a00;font-weight:bold;display:block;margin-bottom:3px;">🎾 セカンドサーブ</span>
+          <button class="srv-big" id="srv2-ok" onclick="setSrv2(true)">✓ イン</button>
+          <button class="srv-big" id="srv2-ng" onclick="setSrv2(false)">✕ DF</button>
+        </div>
+      </div>
       <div class="iblock">
-        <div class="ilabel">陣形 / 理由 / コース</div>
+        <div class="ilabel">陣形 / 理由</div>
         <div class="sel-status">選択中：<b id="sel-disp">-</b></div>
-        <!-- X陣形 multi-select -->
-        <div class="brow"><span id="lfx">X陣形：</span>
+        <!-- 陣形を1行に -->
+        <div class="brow" style="flex-wrap:nowrap;overflow-x:auto;">
+          <span id="lfx" style="font-size:9px;color:#004400;white-space:nowrap;min-width:auto;">X:</span>
           <button class="sel-btn on-green" id="fx0" onclick="togF('fX','雁行',this)">雁行</button>
           <button class="sel-btn" id="fx1" onclick="togF('fX','並行',this)">並行</button>
           <button class="sel-btn" id="fx2" onclick="togF('fX','二枚後衛',this)">二枚後衛</button>
-        </div>
-        <!-- Y陣形 multi-select -->
-        <div class="brow"><span id="lfy">Y陣形：</span>
+          <span style="margin:0 4px;color:#ccc;">|</span>
+          <span id="lfy" style="font-size:9px;color:#660000;white-space:nowrap;min-width:auto;">Y:</span>
           <button class="sel-btn on-red" id="fy0" onclick="togF('fY','雁行',this)">雁行</button>
           <button class="sel-btn" id="fy1" onclick="togF('fY','並行',this)">並行</button>
           <button class="sel-btn" id="fy2" onclick="togF('fY','二枚後衛',this)">二枚後衛</button>
         </div>
-        <div class="brow"><span style="font-size:9px;color:#555;min-width:56px;">理由：</span>
-          <button class="sel-btn on-orange" id="rs0" onclick="sg('rsn','',this,'rs','orange')">通常</button>
+        <!-- 理由：通常 -->
+        <div id="rsn-ui">
+        <div class="brow">
+          <span style="font-size:9px;color:#555;min-width:40px;">理由：</span>
+          <button class="sel-btn on-orange" id="rs0" onclick="selRsn('',this)">通常</button>
         </div>
-        <div class="brow"><span style="font-size:8px;color:#1a5a1a;min-width:56px;font-weight:bold;">▶ 得点</span>
-          <button class="sel-btn" id="rs1" onclick="sg('rsn','SA',this,'rs','orange')">SA エース</button>
-          <button class="sel-btn" id="rs3" onclick="sg('rsn','STR',this,'rs','orange')">STR ストローク</button>
-          <button class="sel-btn" id="rs5" onclick="sg('rsn','PO',this,'rs','orange')">PO ポーチ</button>
-          <button class="sel-btn" id="rs7" onclick="sg('rsn','SM',this,'rs','orange')">SM スマッシュ</button>
+        <!-- 得点 -->
+        <div class="brow">
+          <span style="font-size:8px;color:#1a5a1a;font-weight:bold;min-width:40px;">▶得点</span>
+          <button class="sel-btn" id="rs1" onclick="selRsn('SA',this)">SAエース</button>
+          <button class="sel-btn" id="rs_str" onclick="selRsn('_STR',this)">ストローク▾</button>
+          <button class="sel-btn" id="rs_vol" onclick="selRsn('_VOL',this)">ボレー▾</button>
+          <button class="sel-btn" id="rs_sm" onclick="selRsn('SM',this)">スマッシュ</button>
         </div>
-        <div class="brow"><span style="font-size:8px;color:#8a1a1a;min-width:56px;font-weight:bold;">▶ 失点</span>
-          <button class="sel-btn" id="rs2" onclick="sg('rsn','DF',this,'rs','orange')">DF フォルト</button>
-          <button class="sel-btn" id="rs4" onclick="sg('rsn','UE',this,'rs','orange')">UE ミス</button>
-          <button class="sel-btn" id="rs6" onclick="sg('rsn','RE',this,'rs','orange')">RE レシーブミス</button>
-          <button class="sel-btn" id="rs8" onclick="sg('rsn','BVE',this,'rs','orange')">BVE ボレーミス</button>
-          <button class="sel-btn" id="rs9" onclick="sg('rsn','SME',this,'rs','orange')">SME スマッシュミス</button>
+        <!-- ストローク サブ -->
+        <div class="sub-row green" id="sub-str">
+          <span class="sub-lbl" style="color:#1a5a1a;">打法：</span>
+          <button class="sel-btn" id="str0" onclick="selStrType('FH')">FH</button>
+          <button class="sel-btn" id="str1" onclick="selStrType('BH')">BH</button>
+          <button class="sel-btn" id="str2" onclick="selStrType('カット')">カット</button>
+          <button class="sel-btn" id="str3" onclick="selStrType('シュート')">シュート</button>
+          <button class="sel-btn" id="str4" onclick="selStrType('パッシング')">パッシング</button>
         </div>
-        <div class="sa-row" id="sa-row">
-          <span style="font-size:9px;color:#885500;min-width:72px;font-weight:bold;">🎾 SAコース：</span>
-          <button class="sel-btn on-orange" id="sa0" onclick="sgSub('saDir','正クロス',this,'sa')">正クロス</button>
-          <button class="sel-btn" id="sa1" onclick="sgSub('saDir','逆クロス',this,'sa')">逆クロス</button>
-        </div>
-        <div class="course-row" id="course-row">
-          <span style="font-size:9px;color:#004400;min-width:72px;font-weight:bold;">🎯 コース：</span>
+        <!-- ストローク コース サブ -->
+        <div class="sub-row green" id="sub-co">
+          <span class="sub-lbl" style="color:#1a5a1a;">コース：</span>
           <button class="sel-btn on-green" id="co0" onclick="sgSub('co','クロス',this,'co')">クロス</button>
           <button class="sel-btn" id="co1" onclick="sgSub('co','スト',this,'co')">スト</button>
           <button class="sel-btn" id="co2" onclick="sgSub('co','センター',this,'co')">センター</button>
           <button class="sel-btn" id="co3" onclick="sgSub('co','ロブ',this,'co')">ロブ</button>
+          <button class="sel-btn" id="co4" onclick="sgSub('co','中ロブ',this,'co')">中ロブ</button>
         </div>
+        <!-- ボレー サブ -->
+        <div class="sub-row green" id="sub-vol">
+          <span class="sub-lbl" style="color:#1a5a1a;">種別：</span>
+          <button class="sel-btn" id="vol0" onclick="selVolType('ボレー')">ボレー</button>
+          <button class="sel-btn" id="vol1" onclick="selVolType('ポーチボレー')">ポーチボレー</button>
+          <button class="sel-btn" id="vol2" onclick="selVolType('ローボレー')">ローボレー</button>
+        </div>
+        <!-- SAコース サブ -->
+        <div class="sub-row orange" id="sub-sa">
+          <span class="sub-lbl" style="color:#885500;">SAコース：</span>
+          <button class="sel-btn on-orange" id="sa0" onclick="sgSub('saDir','正クロス',this,'sa')">正クロス</button>
+          <button class="sel-btn" id="sa1" onclick="sgSub('saDir','逆クロス',this,'sa')">逆クロス</button>
+        </div>
+        <!-- 失点 -->
+        <div class="brow">
+          <span style="font-size:8px;color:#8a1a1a;font-weight:bold;min-width:40px;">▶失点</span>
+          <button class="sel-btn" id="rs_miss" onclick="selRsn('_MISS',this)">ミス▾</button>
+          <button class="sel-btn" id="rs2" onclick="selRsn('DF',this)">DF</button>
+          <button class="sel-btn" id="rs6" onclick="selRsn('RE',this)">RE レシーブ</button>
+        </div>
+        <!-- ミス サブ -->
+        <div class="sub-row red" id="sub-miss">
+          <span class="sub-lbl" style="color:#8a1a1a;">種別：</span>
+          <button class="sel-btn" id="ms0" onclick="selMissType('UE')">UE</button>
+          <button class="sel-btn" id="ms1" onclick="selMissType('バックアウト')">バックアウト</button>
+          <button class="sel-btn" id="ms2" onclick="selMissType('サイドアウト')">サイドアウト</button>
+          <button class="sel-btn" id="ms3" onclick="selMissType('ネット')">ネット</button>
+          <button class="sel-btn" id="ms4" onclick="selMissType('BVE')">ボレーミス</button>
+          <button class="sel-btn" id="ms5" onclick="selMissType('SME')">スマッシュミス</button>
+        </div>
+        </div><!-- /rsn-ui -->
       </div>
       <div class="miss-note" id="miss-note"></div>
       <div id="sig"></div>
@@ -367,7 +423,7 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
 var NUMS=['①','②','③','④','⑤','⑥','⑦','⑧','⑨'];
 var FORMS=['雁行','並行','二枚後衛'];
 // G.fX, G.fY は配列（multi-select）
-var G={fX:['雁行'],fY:['雁行'],co:'クロス',rsn:'',saDir:'正クロス',fs:'X',fp:'A',mg:5};
+var G={fX:['雁行'],fY:['雁行'],co:'クロス',rsn:'',saDir:'正クロス',fs:'X',fp:'A',mg:5,srv1:null,srv2:null};
 var matches=[],cur=null;
 var folders=[]; // [{id, name}]
 
@@ -383,9 +439,22 @@ function winN(m){return Math.ceil(m.mg/2);}
 function getSrv(m,g){return(g%2===0)?m.fs:(m.fs==='X'?'Y':'X');}
 function tnX(m){return m.xname||'チームX';}
 function tnY(m){return m.yname||'チームY';}
-var LOSE_RSN=['DF','UE','RE','BVE','SME'];
+var LOSE_RSN=['DF','UE','RE','BVE','SME','バックアウト','サイドアウト','ネット'];
 function isLose(rsn){return LOSE_RSN.indexOf(rsn)>=0;}
-var RSN_LABEL={'':'通常','SA':'SA エース','DF':'DF フォルト','STR':'STR ストローク','UE':'UE ミス','PO':'PO ポーチ','RE':'RE レシーブミス','SM':'SM スマッシュ','BVE':'BVE ボレーミス','SME':'SME スマッシュミス'};
+var RSN_LABEL={
+  '':'通常','SA':'SAエース','DF':'DF','RE':'REレシーブ','SM':'スマッシュ',
+  'FH':'FHストローク','BH':'BHストローク','カット':'カットストローク',
+  'シュート':'シュートボール','パッシング':'パッシング',
+  'ボレー':'ボレー','ポーチボレー':'ポーチボレー','ローボレー':'ローボレー',
+  'UE':'UEミス','バックアウト':'バックアウト','サイドアウト':'サイドアウト',
+  'ネット':'ネット','BVE':'ボレーミス','SME':'スマッシュミス'
+};
+// ストローク系かどうか
+var STR_TYPES=['FH','BH','カット','シュート','パッシング'];
+function isStr(rsn){return STR_TYPES.indexOf(rsn)>=0;}
+// ボレー系かどうか
+var VOL_TYPES=['ボレー','ポーチボレー','ローボレー'];
+function isVol(rsn){return VOL_TYPES.indexOf(rsn)>=0;}
 
 function addFolderFromEdit(){
   var inp=document.getElementById('e-newf');
@@ -535,21 +604,136 @@ function getSrvPlayer(m,totalPrevPts){
   return(totalPrevPts%2===base)?'A':'B';
 }
 
-var colorMap={green:'on-green',red:'on-red',blue:'on',orange:'on-orange'};
-function sg(key,val,btn,group,color){
-  G[key]=val;
-  var cls=colorMap[color]||'on';
-  document.querySelectorAll('[id^="'+group+'"]').forEach(function(b){b.classList.remove('on','on-green','on-red','on-orange');});
-  btn.classList.add(cls);
-  if(group==='rs'){
-    document.getElementById('course-row').classList.toggle('active',val==='STR');
-    document.getElementById('sa-row').classList.toggle('active',val==='SA');
-    var note=document.getElementById('miss-note');
-    if(val==='DF'||val==='UE'||val==='RE'){note.style.display='block';note.innerHTML='⚠️ <b>'+RSN_LABEL[val]+'</b>：ミスしたチームを押す → 相手の得点として記録';}
-    else{note.style.display='none';}
-    buildSIG();
+// ===== サーブUI =====
+function updateSrvUI(){
+  if(!cur)return;
+  var g=cur.curG,sv=getSrv(cur,g);
+  var srvUi=document.getElementById('srv-ui');
+  var rsnUi=document.getElementById('rsn-ui');
+  var sigEl=document.getElementById('sig');
+  // サーブ権あり側のみサーブUI表示
+  srvUi.style.display='block';
+  var lbl=document.getElementById('srv-ui-lbl');
+  lbl.textContent='🎾 '+(sv==='X'?tnX(cur):tnY(cur))+' ファーストサーブ';
+  // 状態リセット
+  document.getElementById('srv-second-row').style.display='none';
+  ['srv1-ok','srv1-ng','srv2-ok','srv2-ng'].forEach(function(id){
+    var b=document.getElementById(id);
+    if(b){b.classList.remove('ok','ng');}
+  });
+  G.srv1=null;G.srv2=null;
+  // 理由UIと得点ボタンは非表示
+  rsnUi.style.display='none';
+  sigEl.style.display='none';
+}
+function setSrv1(isIn){
+  G.srv1=isIn;
+  document.getElementById('srv1-ok').classList.toggle('ok',isIn);
+  document.getElementById('srv1-ng').classList.toggle('ng',!isIn);
+  document.getElementById('srv1-ok').classList.toggle('ng',false);
+  document.getElementById('srv1-ng').classList.toggle('ok',false);
+  if(isIn){
+    // ファースト入り→理由選択へ
+    document.getElementById('srv-second-row').style.display='none';
+    document.getElementById('rsn-ui').style.display='block';
+    document.getElementById('sig').style.display='grid';
+  } else {
+    // フォルト→セカンド表示
+    document.getElementById('srv-second-row').style.display='block';
+    document.getElementById('rsn-ui').style.display='none';
+    document.getElementById('sig').style.display='none';
   }
+}
+function setSrv2(isIn){
+  G.srv2=isIn;
+  document.getElementById('srv2-ok').classList.toggle('ok',isIn);
+  document.getElementById('srv2-ng').classList.toggle('ng',!isIn);
+  if(isIn){
+    // セカンド入り→理由選択へ
+    document.getElementById('rsn-ui').style.display='block';
+    document.getElementById('sig').style.display='grid';
+  } else {
+    // DF→自動で理由DF・得点ボタン表示
+    G.rsn='DF';
+    hideAllSub();clearRsBtn();
+    updateSelStatus();
+    document.getElementById('miss-note').style.display='block';
+    document.getElementById('miss-note').innerHTML='⚠️ DFしたチームを押す → 相手の得点として記録';
+    buildSIG();
+    document.getElementById('rsn-ui').style.display='none';
+    document.getElementById('sig').style.display='grid';
+  }
+}
+function hideAllSub(){
+  ['sub-str','sub-co','sub-vol','sub-sa','sub-miss'].forEach(function(id){
+    document.getElementById(id).classList.remove('active');
+  });
+}
+function clearRsBtn(){
+  ['rs0','rs1','rs2','rs6','rs_str','rs_vol','rs_sm','rs_miss'].forEach(function(id){
+    var b=document.getElementById(id);if(b)b.classList.remove('on','on-green','on-red','on-orange');
+  });
+}
+function selRsn(val,btn){
+  clearRsBtn();
+  hideAllSub();
+  document.getElementById('miss-note').style.display='none';
+  btn.classList.add('on-orange');
+  if(val==='_STR'){
+    // ストロークカテゴリ選択→サブUI表示、rsnはまだ未確定
+    G.rsn='';
+    document.getElementById('sub-str').classList.add('active');
+  } else if(val==='_VOL'){
+    G.rsn='';
+    document.getElementById('sub-vol').classList.add('active');
+  } else if(val==='_MISS'){
+    G.rsn='';
+    document.getElementById('sub-miss').classList.add('active');
+    document.getElementById('miss-note').style.display='block';
+    document.getElementById('miss-note').innerHTML='⚠️ ミスしたチームを押す → 相手の得点として記録';
+  } else if(val==='SA'){
+    G.rsn='SA';
+    document.getElementById('sub-sa').classList.add('active');
+  } else if(val==='DF'){
+    G.rsn='DF';
+    document.getElementById('miss-note').style.display='block';
+    document.getElementById('miss-note').innerHTML='⚠️ DFしたチームを押す → 相手の得点として記録';
+  } else if(val==='RE'){
+    G.rsn='RE';
+    document.getElementById('miss-note').style.display='block';
+    document.getElementById('miss-note').innerHTML='⚠️ レシーブミスしたチームを押す → 相手の得点として記録';
+  } else {
+    G.rsn=val; // ''=通常, SM
+  }
+  buildSIG();
   updateSelStatus();
+}
+function selStrType(type){
+  // 打法ボタンのon状態
+  ['str0','str1','str2','str3','str4'].forEach(function(id){
+    var b=document.getElementById(id);if(b)b.classList.remove('on','on-green','on-red','on-orange');
+  });
+  event.target.classList.add('on-green');
+  G.rsn=type;
+  // コースサブUIも表示
+  document.getElementById('sub-co').classList.add('active');
+  buildSIG();updateSelStatus();
+}
+function selVolType(type){
+  ['vol0','vol1','vol2'].forEach(function(id){
+    var b=document.getElementById(id);if(b)b.classList.remove('on','on-green','on-red','on-orange');
+  });
+  event.target.classList.add('on-green');
+  G.rsn=type;
+  buildSIG();updateSelStatus();
+}
+function selMissType(type){
+  ['ms0','ms1','ms2','ms3','ms4','ms5'].forEach(function(id){
+    var b=document.getElementById(id);if(b)b.classList.remove('on','on-green','on-red','on-orange');
+  });
+  event.target.classList.add('on-red');
+  G.rsn=type;
+  buildSIG();updateSelStatus();
 }
 function sgSub(key,val,btn,group){
   G[key]=val;
@@ -558,9 +742,11 @@ function sgSub(key,val,btn,group){
   updateSelStatus();
 }
 function updateSelStatus(){
-  var parts=['X:'+fStr(G.fX),'Y:'+fStr(G.fY),'理由:'+(RSN_LABEL[G.rsn]||'通常')];
-  if(G.rsn==='STR')parts.push('コース:'+G.co);
-  if(G.rsn==='SA')parts.push('SAコース:'+G.saDir);
+  var rsn=G.rsn;
+  var rsnTxt=RSN_LABEL[rsn]||'通常';
+  var parts=['X:'+fStr(G.fX),'Y:'+fStr(G.fY),'理由:'+rsnTxt];
+  if(isStr(rsn))parts.push('コース:'+G.co);
+  if(rsn==='SA')parts.push('SAコース:'+G.saDir);
   document.getElementById('sel-disp').textContent=parts.join('　');
 }
 
@@ -592,9 +778,15 @@ function showMatchUI(){
   document.getElementById('sheet-wrap').style.display='block';
   document.getElementById('status').style.display='flex';
   document.getElementById('input-wrap').style.display='block';
-  document.getElementById('lfx').textContent=tnX(cur).substring(0,4)+'陣形：';
-  document.getElementById('lfy').textContent=tnY(cur).substring(0,4)+'陣形：';
+  document.getElementById('lfx').textContent=tnX(cur).substring(0,2)+':';
+  document.getElementById('lfy').textContent=tnY(cur).substring(0,2)+':';
   updateSelStatus();buildSIG();renderSheet();updateStatus();
+  if(!cur.done)updateSrvUI();
+  else{
+    document.getElementById('srv-ui').style.display='none';
+    document.getElementById('rsn-ui').style.display='none';
+    document.getElementById('sig').style.display='none';
+  }
 }
 
 function buildSIG(){
@@ -646,9 +838,10 @@ function recordPt(winner,player){
   var srvCourse=(prevSrvCount%2===0)?'正クロス':'逆クロス';
   var pt={
     winner:winner,player:player,serve:sv,srvPlayer:srvPlayer,srvCourse:srvCourse,
-    fX:fStr(G.fX),fY:fStr(G.fY),rsn:G.rsn,game:g,gIdx:gIdx
+    fX:fStr(G.fX),fY:fStr(G.fY),rsn:G.rsn,game:g,gIdx:gIdx,
+    srv1:G.srv1,srv2:G.srv2
   };
-  if(G.rsn==='STR')pt.co=G.co;
+  if(isStr(G.rsn))pt.co=G.co;
   if(G.rsn==='SA')pt.saDir=G.saDir;
   cur.points.push(pt);
   if(winner==='X')cur.gX[g]++;else cur.gY[g]++;
@@ -664,11 +857,16 @@ function recordPt(winner,player){
   // 理由リセット
   G.rsn='';
   document.getElementById('miss-note').style.display='none';
-  document.getElementById('course-row').classList.remove('active');
-  document.getElementById('sa-row').classList.remove('active');
-  document.querySelectorAll('[id^="rs"]').forEach(function(b){b.classList.remove('on','on-green','on-red','on-orange');});
+  hideAllSub();
+  clearRsBtn();
   document.getElementById('rs0').classList.add('on-orange');
   updateSelStatus();buildSIG();renderSheet();updateStatus();persist();
+  if(!cur.done)updateSrvUI();
+  else{
+    document.getElementById('srv-ui').style.display='none';
+    document.getElementById('rsn-ui').style.display='none';
+    document.getElementById('sig').style.display='none';
+  }
 }
 
 function undo(){
@@ -688,6 +886,7 @@ function undo(){
     else if(gy===7){cur.gR[g]='Y';cur.totY++;}
   }
   cur.curG=last.game;buildSIG();renderSheet();updateStatus();persist();
+  if(!cur.done)updateSrvUI();
 }
 
 function doSave(){persist();alert('保存しました');}
@@ -744,8 +943,10 @@ function renderSheet(){
           var cL=document.createElement('div'),cR=document.createElement('div');
           if(ptData){
             var lbl=ptData.rsn||'';
-            if(ptData.rsn==='STR'&&ptData.co)lbl=ptData.co.substring(0,2);
-            if(ptData.rsn==='SA'&&ptData.saDir)lbl=ptData.saDir==='正クロス'?'SA正':'SA逆';
+            if(isStr(ptData.rsn)&&ptData.co)lbl=ptData.rsn.substring(0,2)+ptData.co.substring(0,2);
+            else if(isVol(ptData.rsn))lbl=ptData.rsn.substring(0,3);
+            else if(ptData.rsn==='SA'&&ptData.saDir)lbl=ptData.saDir==='正クロス'?'SA正':'SA逆';
+            else if(ptData.rsn)lbl=ptData.rsn.substring(0,4);
             // 選手名（姓フル表示）
             var pKey=ptData.player||'';
             var pName='';
@@ -802,27 +1003,42 @@ function buildAnalysis(){
   var lx=nx+'（'+m.pXA+'・'+m.pXB+'）',ly=ny+'（'+m.pYA+'・'+m.pYB+'）';
   html+='<div class="ansec"><div class="ansh">① 試合サマリー</div><div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 4px;border:1px solid #ccc;border-radius:3px;background:#fafafa;flex-wrap:wrap;"><span style="color:#004400;font-weight:bold;font-size:10px;">'+lx+'</span><span style="font-size:15px;font-weight:bold;color:#004400;">'+m.totX+'</span><span style="font-size:11px;color:#555;">-</span><span style="font-size:15px;font-weight:bold;color:#660000;">'+m.totY+'</span><span style="color:#660000;font-weight:bold;font-size:10px;">'+ly+'</span><span style="font-size:10px;font-weight:bold;background:#2a1a0a;color:#fff;padding:1px 6px;border-radius:2px;">'+(m.done?(m.totX>m.totY?lx+'勝':ly+'勝'):'進行中')+'</span></div></div>';
   var saX=filt(pts,function(p){return p.rsn==='SA'&&p.winner==='X';}),saY=filt(pts,function(p){return p.rsn==='SA'&&p.winner==='Y';});
-  var strX=filt(pts,function(p){return p.rsn==='STR'&&p.winner==='X';}),strY=filt(pts,function(p){return p.rsn==='STR'&&p.winner==='Y';});
-  var poX=cnt(pts,function(p){return p.rsn==='PO'&&p.winner==='X';}),poY=cnt(pts,function(p){return p.rsn==='PO'&&p.winner==='Y';});
+  var strX=filt(pts,function(p){return isStr(p.rsn)&&p.winner==='X';}),strY=filt(pts,function(p){return isStr(p.rsn)&&p.winner==='Y';});
+  var volX=filt(pts,function(p){return isVol(p.rsn)&&p.winner==='X';}),volY=filt(pts,function(p){return isVol(p.rsn)&&p.winner==='Y';});
   var smX=cnt(pts,function(p){return p.rsn==='SM'&&p.winner==='X';}),smY=cnt(pts,function(p){return p.rsn==='SM'&&p.winner==='Y';});
-  html+='<div class="ansec"><div class="ansh">② 得点パターン</div>'+mkTbl(['チーム','SA','STR','PO','SM','計'],[['<b style="color:#004400;">'+nx+'</b>',saX.length,strX.length,poX,smX,'<b>'+(saX.length+strX.length+poX+smX)+'</b>'],['<b style="color:#660000;">'+ny+'</b>',saY.length,strY.length,poY,smY,'<b>'+(saY.length+strY.length+poY+smY)+'</b>']])+'</div>';
+  html+='<div class="ansec"><div class="ansh">② 得点パターン</div>'+mkTbl(['チーム','SA','STR系','VOL系','SM','計'],[['<b style="color:#004400;">'+nx+'</b>',saX.length,strX.length,volX.length,smX,'<b>'+(saX.length+strX.length+volX.length+smX)+'</b>'],['<b style="color:#660000;">'+ny+'</b>',saY.length,strY.length,volY.length,smY,'<b>'+(saY.length+strY.length+volY.length+smY)+'</b>']])+'</div>';
   var pls=[{k:'XA',n:m.pXA,t:'X',c:'#004400'},{k:'XB',n:m.pXB,t:'X',c:'#004400'},{k:'YA',n:m.pYA,t:'Y',c:'#660000'},{k:'YB',n:m.pYB,t:'Y',c:'#660000'}];
-  html+='<div class="ansec"><div class="ansh">③ 選手別得点</div>'+mkTbl(['選手','得点','SA','STR','PO','SM'],pls.map(function(pl){var pw=filt(pts,function(p){return p.player===pl.k&&p.winner===pl.t;});return['<b style="color:'+pl.c+'">'+pl.n+'('+pl.k.charAt(1)+')</b>','<b>'+pw.length+'</b>',cnt(pw,function(p){return p.rsn==='SA';}),cnt(pw,function(p){return p.rsn==='STR';}),cnt(pw,function(p){return p.rsn==='PO';}),cnt(pw,function(p){return p.rsn==='SM';})]}))+'</div>';
+  html+='<div class="ansec"><div class="ansh">③ 選手別得点</div>'+mkTbl(['選手','得点','SA','STR系','VOL系','SM'],pls.map(function(pl){var pw=filt(pts,function(p){return p.player===pl.k&&p.winner===pl.t;});return['<b style="color:'+pl.c+'">'+pl.n+'('+pl.k.charAt(1)+')</b>','<b>'+pw.length+'</b>',cnt(pw,function(p){return p.rsn==='SA';}),cnt(pw,function(p){return isStr(p.rsn);}),cnt(pw,function(p){return isVol(p.rsn);}),cnt(pw,function(p){return p.rsn==='SM';})]}))+'</div>';
   html+='<div class="ansec"><div class="ansh">④ サーブ分析（個人別）</div>';
   var srvPls=[{k:'XA',n:m.pXA,t:'X',c:'#004400'},{k:'XB',n:m.pXB,t:'X',c:'#004400'},{k:'YA',n:m.pYA,t:'Y',c:'#660000'},{k:'YB',n:m.pYB,t:'Y',c:'#660000'}];
   var srvRows=srvPls.map(function(pl){
     var sp=filt(pts,function(p){return p.srvPlayer===pl.k;});
     var total=sp.length;
+    // ファーストサーブ確率（srv1が記録されているポイントのみ）
+    var f1pts=filt(sp,function(p){return p.srv1!=null;});
+    var f1in=cnt(f1pts,function(p){return p.srv1===true;});
+    var f1pct=f1pts.length?Math.round(f1in/f1pts.length*100):null;
+    var f1str=f1pts.length?(f1in+'/'+f1pts.length+'('+f1pct+'%)'):'-';
+    // セカンドサーブ確率（srv1=false かつsrv2記録あり）
+    var f2pts=filt(sp,function(p){return p.srv1===false&&p.srv2!=null;});
+    var f2in=cnt(f2pts,function(p){return p.srv2===true;});
+    var f2pct=f2pts.length?Math.round(f2in/f2pts.length*100):null;
+    var f2str=f2pts.length?(f2in+'/'+f2pts.length+'('+f2pct+'%)'):'(DF含)-';
     var saC=cnt(sp,function(p){return p.rsn==='SA';});
     var dfC=cnt(sp,function(p){return p.rsn==='DF';});
     var saSeC=cnt(sp,function(p){return p.rsn==='SA'&&p.srvCourse==='正クロス';});
     var saRvC=cnt(sp,function(p){return p.rsn==='SA'&&p.srvCourse==='逆クロス';});
-    var dfSeC=cnt(sp,function(p){return p.rsn==='DF'&&p.srvCourse==='正クロス';});
-    var dfRvC=cnt(sp,function(p){return p.rsn==='DF'&&p.srvCourse==='逆クロス';});
     var r=function(a,b){return b?a+'本('+Math.round(a/b*100)+'%)':'-';};
-    return['<b style="color:'+pl.c+'">'+pl.n+'('+pl.k.charAt(1)+')</b>',total+'本',r(saC,total),r(dfC,total),r(saSeC,total),r(saRvC,total),r(dfSeC,total),r(dfRvC,total)];
+    return[
+      '<b style="color:'+pl.c+'">'+pl.n+'('+pl.k.charAt(1)+')</b>',
+      total+'本',
+      '<b style="color:'+(f1pct!=null&&f1pct>=60?'#1a5a1a':'#8a1a1a')+'">'+f1str+'</b>',
+      f2str,
+      r(saC,total),r(dfC,total),
+      r(saSeC,total),r(saRvC,total)
+    ];
   });
-  html+=mkTbl(['選手','総数','SA(率)','DF(率)','正SA(率)','逆SA(率)','正DF(率)','逆DF(率)'],srvRows)+'</div>';
+  html+=mkTbl(['選手','総数','1st確率','2nd確率','SA(率)','DF(率)','正SA','逆SA'],srvRows)+'</div>';
   html+='<div class="ansec"><div class="ansh">⑤ ストロークコース分析（選手別）</div>';
   var COURSES=['クロス','スト','センター','ロブ'];
   var strRows=pls.map(function(pl){
@@ -835,12 +1051,17 @@ function buildAnalysis(){
   html+='<div class="ansec"><div class="ansh">⑥ ミス分析（選手別）</div>';
   var missRows=pls.map(function(pl){
     var df=cnt(pts,function(p){return p.rsn==='DF'&&p.srvPlayer===pl.k;});
-    var ue=cnt(pts,function(p){return p.rsn==='UE'&&p.winner!==pl.t&&p.player===pl.k;});
     var re=cnt(pts,function(p){return p.rsn==='RE'&&p.winner!==pl.t&&p.player===pl.k;});
-    var total=df+ue+re;
-    return['<b style="color:'+pl.c+'">'+pl.n+'('+pl.k.charAt(1)+')</b>',df,ue,re,'<span style="color:#cc0000;font-weight:bold;">'+total+'P</span>'];
+    var ue=cnt(pts,function(p){return p.rsn==='UE'&&p.winner!==pl.t&&p.player===pl.k;});
+    var bo=cnt(pts,function(p){return p.rsn==='バックアウト'&&p.winner!==pl.t&&p.player===pl.k;});
+    var so=cnt(pts,function(p){return p.rsn==='サイドアウト'&&p.winner!==pl.t&&p.player===pl.k;});
+    var nt=cnt(pts,function(p){return p.rsn==='ネット'&&p.winner!==pl.t&&p.player===pl.k;});
+    var bv=cnt(pts,function(p){return p.rsn==='BVE'&&p.winner!==pl.t&&p.player===pl.k;});
+    var sm=cnt(pts,function(p){return p.rsn==='SME'&&p.winner!==pl.t&&p.player===pl.k;});
+    var total=df+re+ue+bo+so+nt+bv+sm;
+    return['<b style="color:'+pl.c+'">'+pl.n+'('+pl.k.charAt(1)+')</b>',df,re,ue,bo,so,nt,bv,sm,'<span style="color:#cc0000;font-weight:bold;">'+total+'P</span>'];
   });
-  html+=mkTbl(['選手','DF','UE','RE','計失点'],missRows)+'</div>';
+  html+=mkTbl(['選手','DF','RE','UE','バックアウト','サイドアウト','ネット','BVE','SME','計'],missRows)+'</div>';
   // ⑦ 陣形別（+連結文字列キーで集計）
   html+='<div class="ansec"><div class="ansh">⑦ 陣形別</div>';
   var fxKeys={},fyKeys={};

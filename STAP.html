@@ -82,11 +82,9 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
 .sub-lbl{font-size:9px;font-weight:bold;min-width:60px;}
 .sel-status{font-size:9px;background:#fff9e0;border:1px solid #ccaa44;padding:3px 6px;border-radius:3px;margin-bottom:4px;color:#554400;}
 .miss-note{font-size:9px;background:#fff0f0;border:1px solid #cc4444;padding:4px 6px;border-radius:3px;margin-bottom:4px;display:none;color:#880000;}
-#srv-ui{background:#fff8e8;border:1px solid #e8c050;border-radius:4px;padding:6px;margin-bottom:4px;display:none;}
-#srv-ui .srv-lbl{font-size:9px;font-weight:bold;color:#7a5a00;margin-bottom:4px;}
-.srv-big{padding:10px 14px;font-size:13px;font-weight:bold;border-radius:4px;border:2px solid #aaa;background:#f5f5f5;color:#333;margin-right:4px;}
-.srv-big.ok{background:#1a6a1a;color:#fff;border-color:#1a6a1a;}
-.srv-big.ng{background:#8a1a1a;color:#fff;border-color:#8a1a1a;}
+#srv-ui{background:#fff8e8;border:1px solid #e8c050;border-radius:4px;padding:5px 6px;margin-bottom:4px;display:none;}
+#srv-ui .srv-lbl{font-size:9px;font-weight:bold;color:#7a5a00;margin-bottom:3px;}
+
 #rsn-ui{display:none;}
 #sig{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:4px;}
 .tbox{border:2px solid #ccc;border-radius:4px;padding:5px;}
@@ -188,14 +186,18 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
       <!-- ② サーブUI（サーブ権あり側のみ表示） -->
       <div id="srv-ui">
         <div class="srv-lbl" id="srv-ui-lbl">🎾 ファーストサーブ</div>
+        <div id="srv-player-info" style="font-size:10px;margin-bottom:4px;display:flex;gap:6px;flex-wrap:wrap;">
+          <span id="srv-team-name" style="font-weight:bold;color:#2a1a0a;"></span>
+          <span id="srv-player-name" style="color:#555;"></span>
+        </div>
         <div id="srv-first-row">
-          <button class="srv-big" id="srv1-ok" onclick="setSrv1(true)">✓ イン</button>
-          <button class="srv-big" id="srv1-ng" onclick="setSrv1(false)">✕ フォルト</button>
+          <button class="sel-btn" id="srv1-ok" onclick="setSrv1(true)">✓ イン</button>
+          <button class="sel-btn" id="srv1-ng" onclick="setSrv1(false)">✕ フォルト</button>
         </div>
         <div id="srv-second-row" style="display:none;margin-top:4px;">
           <span style="font-size:9px;color:#7a5a00;font-weight:bold;display:block;margin-bottom:3px;">🎾 セカンドサーブ</span>
-          <button class="srv-big" id="srv2-ok" onclick="setSrv2(true)">✓ イン</button>
-          <button class="srv-big" id="srv2-ng" onclick="setSrv2(false)">✕ DF</button>
+          <button class="sel-btn" id="srv2-ok" onclick="setSrv2(true)">✓ イン</button>
+          <button class="sel-btn" id="srv2-ng" onclick="setSrv2(false)">✕ DF</button>
         </div>
       </div>
       <div class="iblock">
@@ -302,9 +304,6 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
 <div id="mov" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;overflow-y:auto;padding:10px;">
   <div id="mbox">
     <h3>新規試合</h3>
-    <label>大会名</label><input id="m-trn" placeholder="例：県大会予選">
-    <label>日付</label><input id="m-dat" type="date">
-    <label>コート番号</label><input id="m-ct" placeholder="例：3">
     <!-- フォルダ選択 -->
     <div class="msec">
       <h4>▶ フォルダ</h4>
@@ -316,15 +315,18 @@ button{cursor:pointer;font-family:inherit;touch-action:manipulation;border:1px s
         <button onclick="addFolderFromModal()">追加</button>
       </div>
     </div>
+    <label>大会名</label><input id="m-trn" placeholder="例：県大会予選">
+    <label>日付</label><input id="m-dat" type="date">
+    <label>コート番号</label><input id="m-ct" placeholder="例：3">
     <div class="msec">
       <h4 style="color:#004400;">▶ チームX（自チーム）</h4>
-      <label>チーム名</label><input id="m-xn" placeholder="例：田中・鈴木ペア">
-      <label>選手A（後衛）</label><input id="m-xa" placeholder="例：田中">
-      <label>選手B（前衛）</label><input id="m-xb" placeholder="例：鈴木">
+      <label>チーム名</label><input id="m-xn" placeholder="例：田中・鈴木ペア" oninput="updateSrvBtnLabels()">
+      <label>選手A（後衛）</label><input id="m-xa" placeholder="例：田中" oninput="updateSrvBtnLabels()">
+      <label>選手B（前衛）</label><input id="m-xb" placeholder="例：鈴木" oninput="updateSrvBtnLabels()">
     </div>
     <div class="msec">
       <h4 style="color:#660000;">▶ チームY（相手チーム）</h4>
-      <label>チーム名</label><input id="m-yn" placeholder="例：山田・佐藤ペア">
+      <label>チーム名</label><input id="m-yn" placeholder="例：山田・佐藤ペア" oninput="updateSrvBtnLabels()">
       <label>選手A（後衛）</label><input id="m-ya" placeholder="例：山田">
       <label>選手B（前衛）</label><input id="m-yb" placeholder="例：佐藤">
     </div>
@@ -577,6 +579,11 @@ function openModal(){
   document.getElementById('m-dat').value=new Date().toISOString().split('T')[0];
   G.fs='X';G.fp='A';G.mg=5;setFS('X');setFP('A');setMG(5);
   rebuildFolderSelect();
+  // ボタンラベルをデフォルトに戻す
+  document.getElementById('fs-x').textContent='🎾 チームX';
+  document.getElementById('fs-y').textContent='🎾 チームY';
+  document.getElementById('fp-a').textContent='👤 A（後衛）から';
+  document.getElementById('fp-b').textContent='👤 B（前衛）から';
 }
 function closeModal(){document.getElementById('mov').style.display='none';}
 // モーダル外クリックで閉じない（フォルダ追加ボタンの伝播問題を回避）
@@ -592,16 +599,31 @@ function setFS(t){
   G.fs=t;
   document.getElementById('fs-x').classList.toggle('on',t==='X');
   document.getElementById('fs-y').classList.toggle('on',t==='Y');
+  updateSrvBtnLabels();
 }
 function setFP(p){
   G.fp=p;
   document.getElementById('fp-a').classList.toggle('on',p==='A');
   document.getElementById('fp-b').classList.toggle('on',p==='B');
 }
+function updateSrvBtnLabels(){
+  var xn=(document.getElementById('m-xn').value||'').trim()||'チームX';
+  var yn=(document.getElementById('m-yn').value||'').trim()||'チームY';
+  document.getElementById('fs-x').textContent='🎾 '+xn;
+  document.getElementById('fs-y').textContent='🎾 '+yn;
+  // 最初のサーバー：サーブ権チームのXA/XBを表示
+  var fs=G.fs||'X';
+  var pA=(fs==='X'?(document.getElementById('m-xa').value||'').trim():(document.getElementById('m-ya').value||'').trim())||'A（後衛）';
+  var pB=(fs==='X'?(document.getElementById('m-xb').value||'').trim():(document.getElementById('m-yb').value||'').trim())||'B（前衛）';
+  document.getElementById('fp-a').textContent='👤 '+pA+'から';
+  document.getElementById('fp-b').textContent='👤 '+pB+'から';
+}
 
 function getSrvPlayer(m,totalPrevPts){
+  // 2ポイントごとにサーバー交代
+  var cycle=Math.floor(totalPrevPts/2)%2;
   var base=(m.fp==='A')?0:1;
-  return(totalPrevPts%2===base)?'A':'B';
+  return(cycle===base%2)?'A':'B';
 }
 
 // ===== サーブUI =====
@@ -613,13 +635,21 @@ function updateSrvUI(){
   var sigEl=document.getElementById('sig');
   // サーブ権あり側のみサーブUI表示
   srvUi.style.display='block';
+  var svTeam=sv==='X'?tnX(cur):tnY(cur);
   var lbl=document.getElementById('srv-ui-lbl');
-  lbl.textContent='🎾 '+(sv==='X'?tnX(cur):tnY(cur))+' ファーストサーブ';
+  lbl.textContent='🎾 ファーストサーブ';
+  // チーム名・サーブ選手名表示
+  var totalPts=cur.points.length;
+  var srvP=getSrvPlayer(cur,totalPts);
+  var srvPlayerName=sv==='X'?(srvP==='A'?cur.pXA:cur.pXB):(srvP==='A'?cur.pYA:cur.pYB);
+  document.getElementById('srv-team-name').textContent=svTeam;
+  document.getElementById('srv-team-name').style.color=sv==='X'?'#004400':'#660000';
+  document.getElementById('srv-player-name').textContent='サーバー：'+srvPlayerName+'（'+srvP+'）';
   // 状態リセット
   document.getElementById('srv-second-row').style.display='none';
   ['srv1-ok','srv1-ng','srv2-ok','srv2-ng'].forEach(function(id){
     var b=document.getElementById(id);
-    if(b){b.classList.remove('ok','ng');}
+    if(b){b.classList.remove('on-green','on-red');}
   });
   G.srv1=null;G.srv2=null;
   // 理由UIと得点ボタンは非表示
@@ -628,10 +658,10 @@ function updateSrvUI(){
 }
 function setSrv1(isIn){
   G.srv1=isIn;
-  document.getElementById('srv1-ok').classList.toggle('ok',isIn);
-  document.getElementById('srv1-ng').classList.toggle('ng',!isIn);
-  document.getElementById('srv1-ok').classList.toggle('ng',false);
-  document.getElementById('srv1-ng').classList.toggle('ok',false);
+  document.getElementById('srv1-ok').classList.toggle('on-green',isIn);
+  document.getElementById('srv1-ng').classList.toggle('on-red',!isIn);
+  document.getElementById('srv1-ok').classList.remove('on-red');
+  document.getElementById('srv1-ng').classList.remove('on-green');
   if(isIn){
     // ファースト入り→理由選択へ
     document.getElementById('srv-second-row').style.display='none';
@@ -646,8 +676,8 @@ function setSrv1(isIn){
 }
 function setSrv2(isIn){
   G.srv2=isIn;
-  document.getElementById('srv2-ok').classList.toggle('ok',isIn);
-  document.getElementById('srv2-ng').classList.toggle('ng',!isIn);
+  document.getElementById('srv2-ok').classList.toggle('on-green',isIn);
+  document.getElementById('srv2-ng').classList.toggle('on-red',!isIn);
   if(isIn){
     // セカンド入り→理由選択へ
     document.getElementById('rsn-ui').style.display='block';

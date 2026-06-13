@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stap-v2';
+const CACHE_NAME = 'stap-v3';
 const ASSETS = [
   './stap_premium.html',
   './stap_icon_512_10inch.png'
